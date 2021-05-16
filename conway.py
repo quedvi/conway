@@ -71,17 +71,15 @@ while True:
     color = new_color(*color, gen)
 
     mx, my = mouse.get_pos()
+    ox, oy = ox + inc_x, oy + inc_y
 
-    ox += inc_x
-    oy += inc_y
-
-    if right_pressed:
+    if right_pressed: # translate 
         move_x, move_y = mouse.get_rel()
         if abs(move_x)<100 and abs(move_y)<100:
-            ox += int(move_x/a)
-            oy += int(move_y/a)
-    if left_pressed:
-        field.add((int(mx/a - ox),int(my/a - oy)))
+            ox, oy = ox + int(move_x/a), oy + int(move_y/a)
+
+    if left_pressed: # add new points
+        field.add((math.floor(mx/a-ox), math.floor(my/a-oy)))
 
 
     textsurface = game_font.render(f'Generation: {gen} / alive: {len(field)}', False, (255, 255, 255))
@@ -99,8 +97,8 @@ while True:
         elif event.type == pg.MOUSEBUTTONDOWN:
             if left:
                 left_pressed = True
-            if middle:
-                coordinates = (int(mx/a-ox),int(my/a -oy))
+            if middle: # delete a single point
+                coordinates = (math.floor(mx/a-ox), math.floor(my/a-oy))
                 if field.issuperset({coordinates}): field.remove(coordinates)
             if right:
                 right_pressed = True
@@ -115,22 +113,25 @@ while True:
             elif event.key == pg.K_q or event.key == pg.K_ESCAPE:
                 pg.quit()
                 sys.exit()
-            elif event.key == pg.K_p or pg.K_SPACE:
-                paused = not paused
             elif event.key == pg.K_UP or event.key == pg.K_w:
                 inc_y = scroll/a
+            elif event.key == pg.K_LEFT or event.key == pg.K_a:
+                inc_x = scroll/a
             elif event.key == pg.K_DOWN or event.key == pg.K_s:
                 inc_y = -scroll/a
             elif event.key == pg.K_RIGHT or event.key == pg.K_d:
                 inc_x = -scroll/a
-            elif event.key == pg.K_LEFT or event.key == pg.K_a:
-                inc_x = scroll/a
             elif event.key == pg.K_PAGEUP:
                 ox, oy, a = zoom(mx, my, ox, oy, a, 1.1)
             elif event.key == pg.K_PAGEDOWN:
                 ox, oy, a = zoom(mx, my, ox, oy, a, 0.9)
-            elif event.key == pg.K_n:
+            elif event.key == pg.K_e or event.key == pg.K_n:
                 field = next_gen(field) # make a step
+            elif event.key == pg.K_p or event.key == pg.K_SPACE:
+                paused = not paused
+            else:
+                pass
+
         elif event.type == pg.KEYUP:
             inc_x = 0
             inc_y = 0
@@ -143,7 +144,7 @@ while True:
 
 
     for x,y in field:
-        if (x  + ox)*a > screen_b or (y + oy)*a > screen_h:
+        if (x+ox)*a > screen_b or (y+oy)*a > screen_h:
             next
     
         pg.draw.rect(screen, color, ((x+ox)*a, (y+oy)*a, a, a))
