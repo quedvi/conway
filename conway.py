@@ -99,7 +99,8 @@ while True:
                 left_pressed = True
             if middle: # delete a single point
                 coordinates = (math.floor(mx/a-ox), math.floor(my/a-oy))
-                if field.issuperset({coordinates}): field.remove(coordinates)
+                if field.issuperset({coordinates}): 
+                    field.remove(coordinates)
             if right:
                 right_pressed = True
         elif event.type == pg.MOUSEWHEEL:
