@@ -1,3 +1,0 @@
-[tools]
-pipenv = {version='latest', pipfile='Pipfile'}
-python = "3.11"
